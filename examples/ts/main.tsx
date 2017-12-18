@@ -113,6 +113,13 @@ class App extends React.Component<{}, State> {
                         <ImageWell onChange={this.handleImageChange5} image={state.viewerState.faceImages[5]} />
                     </li>
                 </ul>
+                <h2>Copyright</h2>
+                <p>
+                    The default cube map image is a work by Emil Persson, aka <a href='http://www.humus.name'>Humus</a>.
+                </p>
+                <p>
+                    hyper3d-envmapgen © 2017 yvt
+                </p>
             </div>
         </div>;
     }
