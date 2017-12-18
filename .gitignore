@@ -1,3 +1,4 @@
 /node_modules
 /target
 /dist
+/examples/dist/*.bundle.js

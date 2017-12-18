@@ -1,0 +1,105 @@
+body, html {
+  background: #333;
+  font-family: sans-serif;
+  font-size: 14px;
+  color: #eee;
+  -webkit-font-smoothing: antialiased;
+}
+div.app-frame {
+  position: absolute;
+  left: 20px; top: 20px; right: 20px; bottom: 20px;
+}
+div.viewport {
+  position: absolute;
+  left: 0; top: 0;
+  width: calc(100% - 250px); height: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+}
+div.controls {
+  position: absolute;
+  right: 0; top: 0;
+  width: 240px; max-height: 100%;
+  background: #555;
+  border-radius: 4px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: 10px;
+  box-shadow: 0px 1.5px 3px rgba(0, 0, 0, 0.2);
+}
+h1 {
+  margin: 0.2em 0;
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #ddd;
+}
+h2 {
+  margin: 0.7em 0;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #ccc;
+}
+
+/*
+ * <ImageWell>
+ */
+div.imagewell {
+  position: relative;
+  border: 2px solid rgba(255, 255,255, 0.1);
+  overflow: hidden;
+  border-radius: 4px;
+}
+div.imagewell.accept {
+  border-style: dashed;
+  border-color: #00ff00;
+}
+div.imagewell:after {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; width: 100%; height: 100%;
+  box-shadow: inset 1px 2px 2px 0px rgba(0, 0, 0, 0.5), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.5);
+  border-radius: 2px;
+}
+div.imagewell img {
+  max-width: 100%; max-height: 100%;
+  width: auto; height: auto;
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/*
+ * Controls — Images
+ */
+ul.images {
+  position: relative;
+  height: 165px;
+}
+ul.images > li {
+  position: absolute;
+  width: 50px; height: 50px;
+}
+ul.images > li:nth-of-type(1) { left: 110px; top: 55px; }
+ul.images > li:nth-of-type(2) { left: 0px; top: 55px; }
+ul.images > li:nth-of-type(3) { left: 55px; top: 0px; }
+ul.images > li:nth-of-type(4) { left: 55px; top: 110px; }
+ul.images > li:nth-of-type(5) { left: 55px; top: 55px; }
+ul.images > li:nth-of-type(6) { left: 165px; top: 55px; }
+ul.images > li > div.imagewell {
+  width: 100%; height: 100%;
+}
+ul.images > li > span {
+  position: absolute;
+  font-size: 11px;
+  background: #aaa;
+  border-radius: 2px;
+  left: 4px; top: 4px;
+  padding: 2px;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #222;
+  z-index: 1;
+}

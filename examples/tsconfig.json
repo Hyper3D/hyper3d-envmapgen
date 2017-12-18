@@ -1,12 +1,11 @@
 {
     "compilerOptions": {
         "outDir": "./dist/",
-        "declaration": true,
         "noImplicitAny": true,
         "sourceMap": true,
         "strict": true,
         "strictNullChecks": true,
-        "module": "CommonJS",
+        "module": "es6",
         "target": "es5",
         "jsx": "react",
         "moduleResolution": "Node",
@@ -17,9 +16,7 @@
             "ES2015.Promise",
             "ES2015.Core",
         ],
+        "allowJs": true,
         "experimentalDecorators": true,
-    },
-    "include": [
-        "ts/**/*"
-    ]
+    }
 }

@@ -8,11 +8,27 @@
   },
   "devDependencies": {
     "@types/node": "^8.5.1",
+    "@types/react": "^16.0.31",
+    "@types/react-dom": "^16.0.3",
+    "@types/react-dropzone": "^4.1.0",
+    "@types/three": "^0.84.35",
     "@types/webassembly-js-api": "0.0.1",
-    "typescript": "^2.6.2"
+    "bind-decorator": "^1.0.11",
+    "file-loader": "^1.1.6",
+    "image-promise": "^5.0.1",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-dropzone": "^4.2.3",
+    "three": "^0.88.0",
+    "ts-loader": "^3.2.0",
+    "typescript": "^2.6.2",
+    "webpack": "^3.10.0",
+    "webpack-dev-server": "^2.9.7"
   },
   "scripts": {
     "build": "./build-wasm.sh && tsc",
+    "build:examples": "cd examples && webpack",
+    "start:examples": "cd examples && webpack-dev-server --open",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "yvt <i@yvt.jp>",
