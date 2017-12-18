@@ -74,6 +74,19 @@ export class LtasgBlur {
         numPasses: number;
     }[] = [];
 
+    /**
+     * Asynchronous constructor of `LtasgBlur`.
+     */
+    static async create(options: Readonly<LtasgOptions>): Promise<LtasgBlur> {
+        const core = await CoreInstance.create(options.core);
+        return new LtasgBlur({ ... options, core });
+    }
+
+    /**
+     * Synchronous constructor of `LtasgBlur`. `options.core`,
+     * `options.core.module` and `options.core.instance` must not be `null` or
+     * `undefined`.
+     */
     constructor(options: Readonly<LtasgOptions>) {
         this.core = new CoreInstance(options.core);
         this.size = options.imageSize | 0;

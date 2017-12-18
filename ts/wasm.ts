@@ -47,7 +47,7 @@ export interface CoreExports {
     ): void;
 }
 
-let globalModule: WebAssembly.Module | null = null;
+let globalModule: Promise<WebAssembly.Module> | null = null;
 
 /**
  * Retrieves the built-in core WebAssembly binary module. Can be used to
@@ -61,9 +61,9 @@ export function getCoreWasmBlob(): Uint8Array {
  * Retrieves the compiled global WebAssembly module. Triggers a synchronous
  * compilation on first use.
  */
-export function getGlobalCoreModule(): WebAssembly.Module {
+export function getGlobalCoreModule(): Promise<WebAssembly.Module> {
     if (!globalModule) {
-        globalModule = new WebAssembly.Module(getCoreWasmBlob());
+        globalModule = WebAssembly.compile(getCoreWasmBlob());
     }
     return globalModule;
 }
@@ -75,9 +75,28 @@ export class CoreInstance implements Readonly<CoreOptions> {
     readonly module: WebAssembly.Module;
     readonly instance: WebAssembly.Instance;
 
+    /**
+     * Asynchronous constructor of `CoreInstance`.
+     */
+    static async create(options: Readonly<CoreOptions> = {}): Promise<CoreInstance> {
+        const module = options.module || await getGlobalCoreModule();
+        const instance = options.instance || await WebAssembly.instantiate(module);
+        return new CoreInstance({ ... options, module,  instance });
+    }
+
+    /**
+     * Synchronous constructor of `CoreInstance`. `options.module` and
+     * `options.instance` must not be `null` or `undefined`.
+     */
     constructor(options: Readonly<CoreOptions> = {}) {
-        this.module = options.module || getGlobalCoreModule();
-        this.instance = options.instance || new WebAssembly.Instance(this.module);
+        if (!options.module) {
+            throw new Error("options.module must be specified for synchronous construction.");
+        }
+        if (!options.instance) {
+            throw new Error("options.instance must be specified for synchronous construction.");
+        }
+        this.module = options.module;
+        this.instance = options.instance;
 
         const emg: CoreExports = this.instance.exports;
         emg.emg_init();
