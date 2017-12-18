@@ -67,7 +67,7 @@ function generateGaussianKernel(radius: number, sigma: number): Float32Array {
 export class LtasgBlur {
     readonly core: CoreInstance;
 
-    private readonly size: number;
+    readonly size: number;
     private readonly plan: {
         kernel: Float32Array,
         kernelScale: number;
@@ -112,7 +112,7 @@ export class LtasgBlur {
             const numPasses = Math.max(Math.ceil(residueVar / (sigmaLimit * sigmaLimit)), minNumPasses);
             const levelSigma = Math.sqrt(residueVar / numPasses) * size;
 
-            const kernelRadius = Math.ceil(levelSigma * kernelResolution * kernelWidth);
+            const kernelRadius = Math.floor(levelSigma * kernelResolution * kernelWidth);
             const kernelScale = 1 / kernelResolution;
 
             const kernel = generateGaussianKernel(
@@ -133,7 +133,7 @@ export class LtasgBlur {
      * @return The processed mipmapped cube map image.
      */
     process(
-        input: (Uint8Array | Float32Array | ImageLike)[],
+        input: ArrayLike<Uint8Array | Float32Array | ImageLike>,
         inFormat: ImageFormat,
         outFormat: ImageFormat,
     ): Float32Array[][] | Uint8Array[][] {
@@ -166,8 +166,9 @@ export class LtasgBlur {
         let currentSize = size;
 
         for (let i = 0; i < plan.length; ++i) {
-            let newSize = (currentSize + 1) >> 1;
+            let newSize = currentSize;
             if (i > 0) {
+                newSize = (newSize + 1) >> 1;
                 // Resample from the previous mip level
                 currentLevel = currentLevel.map(image => resampleRgbF32(
                     image, currentSize, currentSize, newSize, newSize,

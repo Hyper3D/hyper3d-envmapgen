@@ -86,7 +86,7 @@ export function coerceToRgbaF32PremulAlphaFrom(
                 throw new Error("Invalid type for RgbaF32PremulAlpha");
             }
             if (!(image instanceof Uint8Array)) {
-                image = coerceImageToSrgba8StraightAlpha(image);
+                image = coerceImageToSrgba8StraightAlpha(image, width, height);
             }
             const u8 = image;
             const f32 = new Float32Array(u8.length);
@@ -123,6 +123,7 @@ export function coerceRgbaF32PremulAlphaTo(
                 u8[i + 2] = table[$fr(image[i + 2] * scale) & 0xffff];
                 u8[i + 3] = $fr(a * 255) + 0.5;
             }
+            return u8;
         }
         default:
             throw new Error(`Invalid ImageFormat: ${format}`);
@@ -157,8 +158,8 @@ export function resampleRgbF32(
 
     if (inWidth === outWidth * 2 && inHeight === outHeight * 2) {
         for (let y = 0; y < outHeight; ++y) {
-            let inIndex1 = y * 2 * inWidth;
-            let inIndex2 = inIndex1 + inWidth;
+            let inIndex1 = (y * 2 * inWidth) << 2;
+            let inIndex2 = inIndex1 + (inWidth << 2);
             for (let x = 0; x < outWidth; ++x) {
                 let r1 = inImage[inIndex1], g1 = inImage[inIndex1 + 1],
                     b1 = inImage[inIndex1 + 2], a1 = inImage[inIndex1 + 3];

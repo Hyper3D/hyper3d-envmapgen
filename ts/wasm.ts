@@ -196,8 +196,8 @@ export class CoreInstance implements Readonly<CoreOptions> {
         }
 
         let pImages1 = pBuffer;
-        let pImages2 = pBuffer + elements * 4;
-        const pKernel = pImages2 + elements * 4;
+        let pImages2 = pBuffer + elements * 4 * 6;
+        const pKernel = pImages2 + elements * 4 * 6;
 
         // Upload the inputs
         for (let i = 0; i < 6; ++i) {
