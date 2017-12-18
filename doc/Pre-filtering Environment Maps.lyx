@@ -1,0 +1,636 @@
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\begin_modules
+logicalmkup
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_title "Storing 3D Data Inside a 2D Texture"
+\pdf_author "yvt <i@yvt.jp>"
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder true
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Pre-filtering Environment Maps
+\end_layout
+
+\begin_layout Author
+yvt <
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+i@yvt.jp
+\end_layout
+
+\end_inset
+
+>
+\end_layout
+
+\begin_layout Date
+November 29, 2017
+\end_layout
+
+\begin_layout Standard
+Blinn-Phong approximates a Gaussian distribution as the specular exponent
+ increases [Lyon1993].
+ [Olano2010] has shown the following relation in terms of the angle 
+\begin_inset Formula $\theta$
+\end_inset
+
+ between 
+\begin_inset Formula $n$
+\end_inset
+
+ and 
+\begin_inset Formula $h$
+\end_inset
+
+:
+\begin_inset Formula 
+\[
+\cos^{s}(\theta)\approx\exp\left(-\frac{s}{2}\tan^{2}\theta\right)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This makes the spherical Gaussian blur an excellent and appropriate choice
+ for generating environmental maps.
+ By extending the Gaussian blur's separable property, it is possible to
+ implement it in 
+\begin_inset Formula $O(K)$
+\end_inset
+
+ for reasonably small 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ values.
+\end_layout
+
+\begin_layout Section
+Related Work
+\end_layout
+
+\begin_layout Standard
+AMD's CubeMapGen has been a popular choice to generate pre-filtered environment
+ maps.
+ However, it is designed for a offline generation and is too slow for a
+ real-time use.
+\end_layout
+
+\begin_layout Standard
+In three.js, 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+PMREMGenerator
+\end_layout
+
+\end_inset
+
+ is responsible for pre-filtering environment maps.
+ It is implemented as a fragment shader that performs Monte Carlo sampling,
+ and when the sample count is set as low as 32 it is capable of running
+ at 60fps on Intel HD Graphics 4000
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://github.com/mrdoob/three.js/pull/7902
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+.
+ [Colbert2007] describes a practical implementation of GPU-based importance
+ sampling for environment map pre-filtering.
+\end_layout
+
+\begin_layout Section
+Mapping Gloss Values to Mip Levels
+\end_layout
+
+\begin_layout Standard
+I wanted to have a constant kernel radius of 
+\begin_inset Formula $K$
+\end_inset
+
+ (= 8) pixels for every mip level.
+ 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ should be a somewhat smaller value than 
+\begin_inset Formula $K$
+\end_inset
+
+ in order to fit the significant part of the Gaussian distribution within
+ the kernel radius.
+ I chose 
+\begin_inset Formula $\sigma=K/r$
+\end_inset
+
+ where 
+\begin_inset Formula $r=4$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Under this condition and given that the image size of the base mip level
+ is 
+\begin_inset Formula $N$
+\end_inset
+
+ pixels, the relationship between the specular exponent 
+\begin_inset Formula $s$
+\end_inset
+
+ and the mip level 
+\begin_inset Formula $n$
+\end_inset
+
+ is found as following:
+\begin_inset Formula 
+\begin{align*}
+\sigma=1/\sqrt{s} & =\frac{K}{r}\cdot\frac{1}{2^{-n}N}\\
+s & =\left(\frac{2^{-n}Nr}{K}\right)^{2}\\
+ & =0.25(2^{-n}N)^{2}\\
+n & =\frac{1}{2}\log_{2}4sN^{2}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Separate Filtering
+\end_layout
+
+\begin_layout Standard
+The basic idea of the separate Gaussian filter is decomposing a 
+\begin_inset Formula $n$
+\end_inset
+
+-dimensional Gaussian filter into 
+\begin_inset Formula $n$
+\end_inset
+
+ cascaded one-dimensional Gaussian filters as shown in the following example
+ where 
+\begin_inset Formula $n=2$
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{align*}
+G(x,y) & =\frac{1}{2\pi\sigma^{2}}\exp\left(-\frac{x^{2}+y^{2}}{2\sigma^{2}}\right)\\
+G_{x}(x,y) & =\begin{cases}
+\frac{1}{2\pi\sigma^{2}}\exp\left(-\frac{x^{2}}{2\sigma^{2}}\right) & y=0\\
+0 & y\ne0
+\end{cases}\\
+G_{y}(x,y) & =\text{ditto.}\\
+G & =G_{x}\circ G_{y}
+\end{align*}
+
+\end_inset
+
+The decomposition allows a 
+\begin_inset Formula $n$
+\end_inset
+
+-dimensional Gaussian filter to be implemented with the time complexity
+ 
+\begin_inset Formula $O(K)$
+\end_inset
+
+ instead of 
+\begin_inset Formula $O(K^{n})$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+At cost of accuracy, this idea can be extended for a wider variety of filters
+ that locally resemble a Gaussian filter, examples of which include a spatially
+ varying anisotropic Gaussian filter [Zheng2011].
+\end_layout
+
+\begin_layout Standard
+To apply this technique, one has to find the functions 
+\begin_inset Formula $A_{1}(\vec{x}),\ldots,A_{k}(\vec{x})$
+\end_inset
+
+ each of which define the axis direction and the standard deviation of the
+ corresponding one-dimensional Gaussian filter.
+ Note that 
+\begin_inset Formula $\vec{x}$
+\end_inset
+
+ represents a point in a 
+\begin_inset Formula $n$
+\end_inset
+
+-manifold 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+ embedded in a Euclidean space, and 
+\begin_inset Formula $A_{i}(\vec{x})$
+\end_inset
+
+ must be a tangent vector of 
+\begin_inset Formula $\Gamma$
+\end_inset
+
+ at 
+\begin_inset Formula $\vec{x}$
+\end_inset
+
+.
+ The axis functions must fulfill the following condition in order for the
+ resulting filter to locally resemble a 
+\begin_inset Formula $n$
+\end_inset
+
+-dimensional Gaussian filter:
+\begin_inset Formula 
+\[
+\mathrm{rank}(A_{1}(\vec{x})\ \cdots\ A_{k}(\vec{x}))\ge n
+\]
+
+\end_inset
+
+In addition, from a practical perspective, 
+\begin_inset Formula $A_{1}(\vec{x}),\ldots,A_{k}(\vec{x})$
+\end_inset
+
+ must be as smooth as possible because abrupt changes in them lead to visual
+ artifacts.
+\end_layout
+
+\begin_layout Standard
+For a spherical Gaussian blur (
+\begin_inset Formula $\Gamma=S^{2}$
+\end_inset
+
+, 
+\begin_inset Formula $n=2$
+\end_inset
+
+), there exists no 
+\begin_inset Formula $A_{1}(\vec{x}),A_{2}(\vec{x})$
+\end_inset
+
+ that satisfies this condition on every 
+\begin_inset Formula $\vec{x}\in\Gamma$
+\end_inset
+
+, which is obvious from the 
+\begin_inset Quotes eld
+\end_inset
+
+hairy ball theorem
+\begin_inset Quotes erd
+\end_inset
+
+ stating that there exists no nonvanishing continuous tangent vector field
+ on even-dimensional 
+\begin_inset Formula $n$
+\end_inset
+
+-spheres.
+ Therefore, at least 3 axis functions are required to realize a spherical
+ Gaussian blur using this technique.
+ 
+\end_layout
+
+\begin_layout Standard
+I propose the following axis functions (
+\begin_inset Formula $\left\{ \vec{a_{1}},\vec{a_{2}},\vec{a_{3}}\right\} $
+\end_inset
+
+ is an orthonormal basis of 
+\begin_inset Formula $\mathbb{R}^{3}$
+\end_inset
+
+):
+\begin_inset Formula 
+\begin{align*}
+A_{1}(\vec{x}) & =\sigma(\vec{a_{1}}-\vec{x}(\vec{x}\cdot\vec{a_{1}}))\\
+A_{2}(\vec{x}) & =\sigma(\vec{a_{2}}-\vec{x}(\vec{x}\cdot\vec{a_{2}}))\\
+A_{3}(\vec{x}) & =\sigma(\vec{a_{3}}-\vec{x}(\vec{x}\cdot\vec{a_{3}}))
+\end{align*}
+
+\end_inset
+
+Each of them represents a tangent vector along the latitude, assuming the
+ points 
+\begin_inset Formula $\pm\vec{a_{i}}$
+\end_inset
+
+ are the north and south poles of the sphere.
+ If 
+\begin_inset Formula $\left\{ \vec{a_{1}},\vec{a_{2}},\vec{a_{3}}\right\} $
+\end_inset
+
+ is substituted with the standard basis, they can be written more neatly
+ as:
+\begin_inset Formula 
+\begin{align*}
+A_{1}(\vec{x}) & =\sigma(\vec{e_{x}}-x_{x}\vec{x})\\
+A_{2}(\vec{x}) & =\sigma(\vec{e_{y}}-x_{y}\vec{x})\\
+A_{3}(\vec{x}) & =\sigma(\vec{e_{z}}-x_{z}\vec{x})\mathbf{}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Derivation
+\end_layout
+
+\begin_layout Standard
+todo (unambiguously derived from the tangential condition + the uniform
+ blur condition + the latitudinal condition)
+\end_layout
+
+\begin_layout Subsection
+Implementation on Cube Maps
+\end_layout
+
+\begin_layout Standard
+For each one-dimensional filter (
+\begin_inset Formula $i\in\{1,2,3\}$
+\end_inset
+
+) and the cube face, there are two cases to handle:
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\pm\vec{a_{i}}$
+\end_inset
+
+ is inside the face — In this case, the filter is implemented as a radial
+ blur oriented toward the pole 
+\begin_inset Formula $\pm\vec{a_{i}}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $\pm\vec{a_{i}}$
+\end_inset
+
+ is outside the face — In this case, the filter is implemented as a directional
+ blur along the U or V direction.
+\end_layout
+
+\begin_layout Standard
+We will only consider the positive Z cube face in the following discussion.
+\end_layout
+
+\begin_layout Standard
+Given a texture coordinate 
+\begin_inset Formula $(u,v)$
+\end_inset
+
+, the corresponding point 
+\begin_inset Formula $\vec{x}\in S^{2}$
+\end_inset
+
+ is found as:
+\begin_inset Formula 
+\[
+\vec{x}=\frac{1}{\sqrt{1+u^{2}+v^{2}}}\begin{pmatrix}u\\
+v\\
+1
+\end{pmatrix}
+\]
+
+\end_inset
+
+In the first case where 
+\begin_inset Formula $\pm\vec{a_{i}}$
+\end_inset
+
+ is inside the face (hence 
+\begin_inset Formula $\vec{a_{i}}=\vec{e_{z}}$
+\end_inset
+
+)
+\begin_inset Formula 
+\[
+A_{i}(\vec{x})=\sigma\begin{pmatrix}-\frac{u}{\sqrt{1+u^{2}+v^{2}}}\\
+-\frac{v}{\sqrt{1+u^{2}+v^{2}}}\\
+1-\frac{1}{1+u^{2}+v^{2}}
+\end{pmatrix}
+\]
+
+\end_inset
+
+By projecting it on the plane 
+\begin_inset Formula $z=1$
+\end_inset
+
+ we obtain:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\left.\frac{d}{dt}\frac{\vec{x}+A_{i}(\vec{x})\cdot t}{\vec{e_{z}}\cdot\left(\vec{x}+A_{i}(\vec{x})\cdot t\right)}\right|_{t=0}=\begin{pmatrix}-u\sigma\sqrt{1+u^{2}+v^{2}}\\
+-v\sigma\sqrt{1+u^{2}+v^{2}}\\
+0
+\end{pmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the second case where 
+\begin_inset Formula $\pm\vec{a_{i}}$
+\end_inset
+
+ is inside the face, assuming 
+\begin_inset Formula $\vec{a_{i}}=\vec{e_{x}}$
+\end_inset
+
+
+\begin_inset Formula 
+\[
+A_{i}(\vec{x})=\sigma\begin{pmatrix}1-\frac{u^{2}}{1+u^{2}+v^{2}}\\
+-\frac{uv}{1+u^{2}+v^{2}}\\
+-\frac{u}{1+u^{2}+v^{2}}
+\end{pmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+By projecting it on the plane 
+\begin_inset Formula $z=1$
+\end_inset
+
+ we obtain:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\left.\frac{d}{dt}\frac{\vec{x}+A_{i}(\vec{x})\cdot t}{\vec{e_{z}}\cdot\left(\vec{x}+A_{i}(\vec{x})\cdot t\right)}\right|_{t=0}=\begin{pmatrix}\sigma\sqrt{1+u^{2}+v^{2}}\\
+0\\
+0
+\end{pmatrix}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section*
+References
+\end_layout
+
+\begin_layout Standard
+[Lyon1993] Lyron, R.
+ 1993.
+ Phong shading reformulation for hardware rendering.
+ Tech.
+ Rep.
+ 43, Apple.
+\end_layout
+
+\begin_layout Standard
+[Olano2010] Olano, M., & Baker, D.
+ (2010, February).
+ LEAN mapping.
+ In Proceedings of the 2010 ACM SIGGRAPH symposium on Interactive 3D Graphics
+ and Games (pp.
+ 181-188).
+ ACM.
+\end_layout
+
+\begin_layout Standard
+[Zheng2011] Zheng, Z., & Saito, S.
+ (2011, August).
+ Screen space anisotropic blurred soft shadows.
+ In SIGGRAPH Posters (p.
+ 75).
+\end_layout
+
+\begin_layout Standard
+[Colbert2007] Colbert, M., & Krivanek, J.
+ (2007).
+ GPU-based importance sampling.
+ GPU Gems, 3, 459-476.
+\end_layout
+
+\end_body
+\end_document

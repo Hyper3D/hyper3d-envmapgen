@@ -1,0 +1,12 @@
+[package]
+name = "hyperenvmap_wasm"
+version = "0.1.0"
+authors = ["yvt <i@yvt.jp>"]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+cgmath = "0.15.0"
+smallvec = "0.5.0"
+hyperenvmap = { path = "../rust" }

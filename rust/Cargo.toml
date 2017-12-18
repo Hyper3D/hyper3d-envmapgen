@@ -1,0 +1,12 @@
+[package]
+name = "hyperenvmap"
+version = "0.1.0"
+authors = ["yvt <i@yvt.jp>"]
+
+[dependencies]
+cgmath = "0.15.0"
+lazy_static = "1.0.0"
+
+[dev-dependencies]
+clap = "2.26.0"
+image = "0.17.0"

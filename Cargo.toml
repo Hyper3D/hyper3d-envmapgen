@@ -1,0 +1,16 @@
+[workspace]
+members = [
+    "rust",
+    "wasmbinding",
+]
+
+[profile.release]
+debug = true
+panic = "abort"
+
+[profile.bench]
+lto = true
+debug = true
+
+[patch.crates-io]
+"rand" = { path = "rust/src/rand" }

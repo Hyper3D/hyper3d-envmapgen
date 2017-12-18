@@ -1,0 +1,20 @@
+{
+  "name": "hyper3d-envmapgen",
+  "version": "1.0.0",
+  "description": "Hyper3D EnvMapGen",
+  "main": "dist/index.js",
+  "dependencies": {
+    "base64-js": "^1.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^8.5.1",
+    "@types/webassembly-js-api": "0.0.1",
+    "typescript": "^2.6.2"
+  },
+  "scripts": {
+    "build": "./build-wasm.sh && tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "yvt <i@yvt.jp>",
+  "license": "MIT"
+}
