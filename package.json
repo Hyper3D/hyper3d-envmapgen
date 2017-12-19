@@ -1,8 +1,12 @@
 {
   "name": "hyper3d-envmapgen",
-  "version": "0.1.0",
-  "description": "Hyper3D EnvMapGen",
+  "version": "0.1.1",
+  "description": "Pre-filtered mipmapped radiance environment map generator that runs on WebAssembly.",
   "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hyper3D/hyper3d-envmapgen.git"
+  },
   "dependencies": {
     "base64-js": "^1.2.1"
   },
@@ -32,7 +36,7 @@
     "build:examples": "cd examples && webpack --config webpack.prod.js",
     "start:examples": "cd examples && webpack-dev-server --open",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepublish": "npm run build"
+    "prepare": "npm run build"
   },
   "author": "yvt <i@yvt.jp>",
   "license": "MIT",
