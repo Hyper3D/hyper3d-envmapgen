@@ -3,3 +3,4 @@
 /dist
 /examples/dist/*.bundle.js
 /examples/dist/*.jpg
+/examples/dist/*.map
