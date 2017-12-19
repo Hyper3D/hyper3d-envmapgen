@@ -10,7 +10,7 @@ import bind from 'bind-decorator';
 const loadImage: (path: string) => Promise<HTMLImageElement> = require('image-promise');
 
 import { Viewport, ViewportPersistent } from './viewport';
-import { ViewerState, DEFAULT_VIEWER_STATE } from './model';
+import { ViewerState, DEFAULT_VIEWER_STATE, SceneState, DEFAULT_SCENE_STATE } from './model';
 import { ImageWell } from './imagewell';
 
 const envImages: string[] = [
@@ -25,6 +25,7 @@ const envImages: string[] = [
 interface State {
     viewportPersistent: ViewportPersistent;
     viewerState: ViewerState;
+    sceneState: SceneState;
 }
 
 class App extends React.Component<{}, State> {
@@ -33,6 +34,7 @@ class App extends React.Component<{}, State> {
         this.state = {
             viewportPersistent: new ViewportPersistent(),
             viewerState: DEFAULT_VIEWER_STATE,
+            sceneState: DEFAULT_SCENE_STATE,
         };
 
         // Load the initial image
@@ -115,11 +117,26 @@ class App extends React.Component<{}, State> {
         }));
     }
 
+    @bind
+    private handleChangeGeometry(e: React.ChangeEvent<HTMLSelectElement>) {
+        const value = e.target.value;
+        this.setState(state => ({
+            ... state,
+            sceneState: {
+                ... state.sceneState,
+                geometry: value as any,
+            },
+        }));
+    }
+
     render() {
         const {state} = this;
 
         return <div className='app-frame'>
-            <Viewport persistent={state.viewportPersistent} viewerState={state.viewerState} />
+            <Viewport
+                persistent={state.viewportPersistent}
+                viewerState={state.viewerState}
+                sceneState={state.sceneState} />
             <div className='controls'>
                 <h1>hyper3d-envmapgen demo</h1>
                 <h2>Images</h2>
@@ -171,6 +188,15 @@ class App extends React.Component<{}, State> {
                         value={state.viewerState.kernelResolution}
                         onChange={this.handleChangeKernelResolution}
                         />
+                </p>
+                <h2>Render</h2>
+                <p>
+                    <select
+                        value={state.sceneState.geometry}
+                        onChange={this.handleChangeGeometry}>
+                        <option value='sphere'>Sphere</option>
+                        <option value='teapot'>Teapot</option>
+                    </select>
                 </p>
                 <h2>Copyright</h2>
                 <p>

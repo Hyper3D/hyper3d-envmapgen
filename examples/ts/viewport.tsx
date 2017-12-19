@@ -10,11 +10,12 @@ import * as THREE from 'three';
 import * as emg from '../../dist/index';
 
 import { Port } from './port';
-import { ViewerState } from './model';
+import { ViewerState, SceneState } from './model';
 
 // Load three.js sample components
 const three = (window as any).THREE = THREE;
 require('three/examples/js/controls/OrbitControls');
+require('three/examples/js/geometries/TeapotBufferGeometry');
 
 // envmapgen
 const MIN_SIGMA = 2 ** -6;
@@ -125,9 +126,15 @@ export class ViewportPersistent {
     readonly material: THREE.ShaderMaterial;
     readonly skyboxMaterial: THREE.ShaderMaterial;
 
+    readonly sphereObject: THREE.Mesh;
+    readonly teapotObject: THREE.Mesh;
+
+    sceneState: SceneState | null = null;
+
     constructor()
     {
-        const geometry = new THREE.SphereBufferGeometry(100, 128, 64);
+        const sphereGeometry = new THREE.SphereBufferGeometry(100, 128, 64);
+        const teapotGeometry = new (three as any).TeapotBufferGeometry(70, 16);
         const material = this.material = new THREE.ShaderMaterial({
             uniforms: {
                 u_EnvironmentTexture: {
@@ -154,8 +161,11 @@ export class ViewportPersistent {
         const skybox = new THREE.Mesh(new THREE.BoxBufferGeometry(40000, 40000, 40000), skyboxMaterial);
         this.scene.add(skybox);
 
-        const obj = new THREE.Mesh(geometry, material);
-        this.scene.add(obj);
+        const sphereObject = this.sphereObject = new THREE.Mesh(sphereGeometry, material);
+        this.scene.add(sphereObject);
+
+        const teapotObject = this.teapotObject = new THREE.Mesh(teapotGeometry, material);
+        this.scene.add(teapotObject);
 
         this.camera.position.set(0, 0, 400);
         // webpack does not know the existence of `THREE.OrbitControls`
@@ -175,9 +185,12 @@ export class ViewportPersistent {
     {
         requestAnimationFrame(this.update);
 
-        if (!this.canvas.parentElement) {
+        if (!this.canvas.parentElement || !this.sceneState) {
             return;
         }
+
+        this.sphereObject.visible = this.sceneState.geometry === 'sphere';
+        this.teapotObject.visible = this.sceneState.geometry === 'teapot';
 
         const bounds = this.canvas.parentElement!.getBoundingClientRect();
         const newWidth = Math.max(1, bounds.width) | 0;
@@ -207,6 +220,7 @@ export class ViewportPersistent {
 export interface ViewportProps {
     persistent: ViewportPersistent;
     viewerState: ViewerState;
+    sceneState: SceneState;
 }
 
 interface State {
@@ -216,7 +230,10 @@ export class Viewport extends React.Component<ViewportProps, State> {
     private currentViewerState: ViewerState | null = null;
 
     private async update(): Promise<void> {
-        const {viewerState} = this.props;
+        const {viewerState, sceneState} = this.props;
+
+        this.props.persistent.sceneState = sceneState;
+
         if (viewerState == this.currentViewerState) {
             return;
         }
