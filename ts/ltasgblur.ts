@@ -99,12 +99,13 @@ export class LtasgBlur {
             const size = (this.size + (1 << i) - 1) >> i;
 
             const desiredSigma = levels[i];
-            const residueVar = desiredSigma * desiredSigma - lastVariance;
+            const desiredVar = desiredSigma * desiredSigma;
+            const residueVar = desiredVar - lastVariance;
             if (residueVar < 0) {
                 throw new Error("mipLevelSigmas must be a monotonically increasing sequence");
             }
 
-            lastVariance = residueVar;
+            lastVariance = desiredVar;
 
             // Upper bound of blur amount that can be applied by a single run of
             // `ltasg_single(..., {0, 1, 2}, ...)`
@@ -116,7 +117,7 @@ export class LtasgBlur {
             const kernelScale = 1 / kernelResolution;
 
             const kernel = generateGaussianKernel(
-                kernelRadius, levelSigma * kernelScale
+                kernelRadius, levelSigma * kernelResolution,
             );
 
             this.plan.push({

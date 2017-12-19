@@ -108,7 +108,7 @@ void main() {
 
     // IBL
     float spec_sigma = 1.0 / sqrt(power);
-    float image_lod = log2(spec_sigma / ${MIN_SIGMA});
+    float image_lod = log2(spec_sigma / ${MIN_SIGMA}) - 1.0; // FIXME: What is the source of this bias?
     vec3 image = textureCubeLodEXT(u_EnvironmentTexture, v_WSReflect, image_lod).xyz;
     gl_FragColor.xyz += image * image;
 
