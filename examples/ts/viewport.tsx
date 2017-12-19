@@ -11,7 +11,6 @@ import * as emg from '../../dist/index';
 
 import { Port } from './port';
 import { ViewerState } from './model';
-import { table } from './utils';
 
 // Load three.js sample components
 const three = (window as any).THREE = THREE;
@@ -236,7 +235,7 @@ export class Viewport extends React.Component<ViewportProps, State> {
         const options: emg.LtasgOptions = {
             core: await emgCore,
             imageSize: viewerState.cubeMapSize,
-            mipLevelSigmas: table(9, i => MIN_SIGMA * 2 ** Math.min(i, 4)),
+            mipLevelSigmas: Array.from(new Array(9), (_, i) => MIN_SIGMA * 2 ** Math.min(i, 4)),
             minNumPasses: viewerState.minNumPasses,
             kernelResolution: viewerState.kernelResolution,
         };
@@ -255,7 +254,7 @@ export class Viewport extends React.Component<ViewportProps, State> {
         // Also, I'd like to use sRGB encoding, but there does not seem to be an
         // easy way to get it working.
         const baseSize = ltasg.size;
-        const threeCubeImages = table(6, face => ({
+        const threeCubeImages = Array.from(new Array(6), (_, face) => ({
             isDataTexture: true,
             image: {
                 width: baseSize,
