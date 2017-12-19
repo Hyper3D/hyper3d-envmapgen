@@ -36,13 +36,18 @@ export interface LtasgOptions
      * Defaults to `2`.
      */
     minNumPasses?: number;
-}
 
-// Hard-coded values. I don't know a good (user-friendly) way to explain these
-// values in the public interface, so I decided to just keep them private.
-const kernelResolution = 2;
-/** Specifies the size of the Gaussian kernel by the ratio to the σ value. */
-const kernelWidth = 3;
+    /**
+     * (Advanced parameter) The resolution of the kernel. Defaults to `2`.
+     */
+    kernelResolution?: number;
+
+    /**
+     * (Advanced parameter) Specifies the size of the Gaussian kernel by the
+     * ratio to the σ value. Defaults to `3`.
+     */
+    kernelWidth?: number;
+}
 
 function generateGaussianKernel(radius: number, sigma: number): Float32Array {
     const v = new Float32Array(radius * 2 + 1);
@@ -91,6 +96,8 @@ export class LtasgBlur {
         this.core = new CoreInstance(options.core);
         this.size = options.imageSize | 0;
         const minNumPasses = (options.minNumPasses || 2) | 0;
+        const kernelWidth = options.kernelWidth || 3;
+        const kernelResolution = options.kernelResolution || 2;
 
         let lastVariance = 0;
 

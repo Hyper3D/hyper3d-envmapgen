@@ -79,6 +79,42 @@ class App extends React.Component<{}, State> {
     @bind private handleImageChange4(image: HTMLImageElement) { this.handleImageChange(4, image); }
     @bind private handleImageChange5(image: HTMLImageElement) { this.handleImageChange(5, image); }
 
+    @bind
+    private handleChangeCubeMapSize(e: React.ChangeEvent<HTMLSelectElement>) {
+        const value = parseInt(e.target.value, 10);
+        this.setState(state => ({
+            ... state,
+            viewerState: {
+                ... state.viewerState,
+                cubeMapSize: value,
+            },
+        }));
+    }
+
+    @bind
+    private handleChangeMinNumPasses(e: React.ChangeEvent<HTMLSelectElement>) {
+        const value = parseInt(e.target.value, 10);
+        this.setState(state => ({
+            ... state,
+            viewerState: {
+                ... state.viewerState,
+                minNumPasses: value,
+            },
+        }));
+    }
+
+    @bind
+    private handleChangeKernelResolution(e: React.ChangeEvent<HTMLInputElement>) {
+        const value = parseFloat(e.target.value);
+        this.setState(state => ({
+            ... state,
+            viewerState: {
+                ... state.viewerState,
+                kernelResolution: value,
+            },
+        }));
+    }
+
     render() {
         const {state} = this;
 
@@ -113,6 +149,29 @@ class App extends React.Component<{}, State> {
                         <ImageWell onChange={this.handleImageChange5} image={state.viewerState.faceImages[5]} />
                     </li>
                 </ul>
+                <h2>Quality</h2>
+                <p>
+                    Size: <select
+                        value={state.viewerState.cubeMapSize}
+                        onChange={this.handleChangeCubeMapSize}>
+                        <option value={32}>32</option>
+                        <option value={64}>64</option>
+                        <option value={128}>128</option>
+                        <option value={256}>256</option>
+                    </select>
+                    &nbsp;# Pass: <select
+                        value={state.viewerState.minNumPasses}
+                        onChange={this.handleChangeMinNumPasses}>
+                        <option value={1}>1 - Fast</option>
+                        <option value={2}>2</option>
+                        <option value={3}>3 - Nice</option>
+                    </select><br />
+                    Density: <input
+                        type='range' min='0.4' max='2' step='0.2'
+                        value={state.viewerState.kernelResolution}
+                        onChange={this.handleChangeKernelResolution}
+                        />
+                </p>
                 <h2>Copyright</h2>
                 <p>
                     The default cube map image is a work by Emil Persson, aka <a href='http://www.humus.name'>Humus</a>.

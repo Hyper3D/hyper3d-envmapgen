@@ -88,6 +88,7 @@ div.imagewell img {
 ul.images {
   position: relative;
   height: 165px;
+  margin-top: -25px;
 }
 ul.images > li {
   position: absolute;

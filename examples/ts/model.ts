@@ -7,8 +7,14 @@
 export interface ViewerState
 {
     readonly faceImages: ReadonlyArray<HTMLImageElement | null>;
+    readonly cubeMapSize: number;
+    readonly minNumPasses: number;
+    readonly kernelResolution: number;
 }
 
 export const DEFAULT_VIEWER_STATE: ViewerState = {
     faceImages: [null, null, null, null, null, null],
+    cubeMapSize: 128,
+    minNumPasses: 2,
+    kernelResolution: 2,
 };

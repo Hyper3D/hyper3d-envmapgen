@@ -18,11 +18,8 @@ const three = (window as any).THREE = THREE;
 require('three/examples/js/controls/OrbitControls');
 
 // envmapgen
-const MIN_SIGMA = 2 ** -5;
-const ltasgPromise = emg.LtasgBlur.create({
-    imageSize: 128,
-    mipLevelSigmas: table(8, i => MIN_SIGMA * 2 ** Math.min(i, 4)),
-});
+const MIN_SIGMA = 2 ** -6;
+const emgCore = emg.CoreInstance.create();
 
 const ACES = `
 mediump vec3 acesToneMapping(mediump vec3 x)
@@ -234,8 +231,24 @@ export class Viewport extends React.Component<ViewportProps, State> {
         }
 
         // Create a PMREM cube map
-        const ltasg = await ltasgPromise;
+        // Note: This synchronous constructor is only available when `core` is
+        //       supplied.
+        const options: emg.LtasgOptions = {
+            core: await emgCore,
+            imageSize: viewerState.cubeMapSize,
+            mipLevelSigmas: table(9, i => MIN_SIGMA * 2 ** Math.min(i, 4)),
+            minNumPasses: viewerState.minNumPasses,
+            kernelResolution: viewerState.kernelResolution,
+        };
+        console.log(options);
+
+        console.time('LTASG plan');
+        const ltasg = new emg.LtasgBlur(options);
+        console.timeEnd('LTASG plan');
+
+        console.time('LTASG process');
         const output = ltasg.process(viewerState.faceImages as any, emg.ImageFormat.Srgbx8, emg.ImageFormat.Srgbx8);
+        console.timeEnd('LTASG process');
 
         // I absolutely have no idea what is the canonical way to pass a PMREM
         // data to three.js

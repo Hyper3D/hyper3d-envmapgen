@@ -6,6 +6,7 @@ members = [
 
 [profile.release]
 debug = true
+lto = true
 panic = "abort"
 
 [profile.bench]
