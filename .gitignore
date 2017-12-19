@@ -2,3 +2,4 @@
 /target
 /dist
 /examples/dist/*.bundle.js
+/examples/dist/*.jpg
