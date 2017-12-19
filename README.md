@@ -33,9 +33,15 @@ Pre-filtered mipmapped radiance environment map generator that runs on WebAssemb
 
 ## Usage: JavaScript
 
+With npm do:
+
+    npm install --save hyper3d-envmapgen
+
+> Other installation methods are not supported at this moment. Use webpack or Browserify. They are really awesome.
+
 The following TypeScript code shows the basic usage of `hyper3d-envmapgen`:
 
-(Just remove the type annotations to convert it to JavaScript)
+> Just remove the type annotations to convert it to JavaScript.
 
 ```ts
 import { LtasgBlur, ImageFormat } from 'hyper3d-envmapgen';
@@ -84,8 +90,8 @@ import { LtasgBlur, ImageFormat } from 'hyper3d-envmapgen';
 And then in your fragment shader...
 
 ```glsl
-float blinn_phong_power = 1024.0;
-float lod = 6.0 - log2(blinn_phong_power) * 0.5 - 1.0;
+float phong_power = 1024.0;
+float lod = 6.0 - log2(phong_power) * 0.5 - 1.0;
 vec3 image = textureCubeLodEXT(u_Texture, v_Reflect, lod);
 ```
 
