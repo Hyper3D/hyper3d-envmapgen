@@ -177,7 +177,7 @@ class App extends React.Component<{}, State> {
                     The default cube map image is a work by Emil Persson, aka <a href='http://www.humus.name'>Humus</a>.
                 </p>
                 <p>
-                    hyper3d-envmapgen © 2017 yvt
+                    <a href='https://github.com/Hyper3D/hyper3d-envmapgen'>hyper3d-envmapgen</a> © 2017 yvt
                 </p>
             </div>
         </div>;

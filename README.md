@@ -5,6 +5,8 @@ Pre-filtered mipmapped radiance environment map generator that runs on WebAssemb
 
 ![](doc/demo.jpg)
 
+[See the example.](https://hyper3d.github.io/hyper3d-envmapgen/examples/index.html)
+
 ## Features
 
 - LTASG (linear-time approximate spherical Gaussian) filtering that can be used to approximate the Blinn-Phong NDF for small roughness values.
