@@ -31,8 +31,14 @@
     "build": "./build-wasm.sh && tsc",
     "build:examples": "cd examples && webpack --config webpack.prod.js",
     "start:examples": "cd examples && webpack-dev-server --open",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublish": "npm run build"
   },
   "author": "yvt <i@yvt.jp>",
-  "license": "MIT"
+  "license": "MIT",
+  "files": [
+    "README.md",
+    "LICENSE",
+    "dist"
+  ]
 }
