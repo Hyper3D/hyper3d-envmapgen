@@ -14,12 +14,12 @@ import { ViewerState, DEFAULT_VIEWER_STATE } from './model';
 import { ImageWell } from './imagewell';
 
 const envImages: string[] = [
-    require('file-loader!../../rust/examples/images/posx.jpg'),
-    require('file-loader!../../rust/examples/images/negx.jpg'),
-    require('file-loader!../../rust/examples/images/posy.jpg'),
-    require('file-loader!../../rust/examples/images/negy.jpg'),
-    require('file-loader!../../rust/examples/images/posz.jpg'),
-    require('file-loader!../../rust/examples/images/negz.jpg'),
+    require('file-loader!../images/nissibeach2/posx.jpg'),
+    require('file-loader!../images/nissibeach2/negx.jpg'),
+    require('file-loader!../images/nissibeach2/posy.jpg'),
+    require('file-loader!../images/nissibeach2/negy.jpg'),
+    require('file-loader!../images/nissibeach2/posz.jpg'),
+    require('file-loader!../images/nissibeach2/negz.jpg'),
 ];
 
 interface State {
