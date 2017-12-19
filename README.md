@@ -102,12 +102,9 @@ This repository provides a crate named `hyperenvmapgen`, which can be found in t
 This crate is never meant to be stablized. Therefore, it is strongly recommended to specify the revision hash as shown below:
 
 ```toml
-[dependencies]
-hyperenvmapgen = { 
-    git = "https://github.com/Hyper3D/hyper3d-envmapgen", 
-    rev = "INSERT REVISION HASH HERE",
-    path = "rust",
-}
+[dependencies.hyperenvmap]
+git = "https://github.com/Hyper3D/hyper3d-envmapgen"
+rev = "INSERT REVISION HASH HERE"
 ```
 
 See `rust/examples/blurcubemap.rs` for the usage.
