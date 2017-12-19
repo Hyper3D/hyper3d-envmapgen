@@ -8,8 +8,9 @@ Pre-filtered mipmapped radiance environment map generator that runs on WebAssemb
 ## Features
 
 - LTASG (linear-time approximate spherical Gaussian) filtering that can be used to approximate the Blinn-Phong NDF for small roughness values.
+- The algorithm is implemented to run entirely on the CPU. This allows asynchronous processing that does not interfere with the main thread's operation, which is hard to achieve with a WebGL-based implementation.
 
-Possible TODOs:
+### Possible TODOs
 
 - More filtering algorithms and techniques
     - GGX + importance sampling
@@ -19,6 +20,14 @@ Possible TODOs:
     - Investigate the behavior with large σ values
 
 [Fast Filtering of Reflection Probes]: https://dl.acm.org/citation.cfm?id=3071786
+
+## Browser Support
+
+`hyper3d-envmapgen` requires [a web browser supporting WebAssembly](https://caniuse.com/#feat=wasm).
+
+|  IE | Edge | Firefox | Chrome | Safari | iOS Safari |
+| :-: | :--: | :-----: | :----: | :----: | :--------: |
+|  No | ≥ 16 |   ≥ 53  |  ≥ 57  |  ≥ 11  |    ≥ 11    |
 
 ## Usage: JavaScript
 
@@ -97,15 +106,25 @@ See `rust/examples/blurcubemap.rs` for the usage.
 
 ## Building
 
-    # Install the Rust toolchain for WebAssembly compilation
-    rustup target add wasm32-unknown-unknown --toolchain nightly
-    cargo install --git https://github.com/alexcrichton/wasm-gc 
+```shell
+# Install the Rust toolchain for WebAssembly compilation
+rustup target add wasm32-unknown-unknown --toolchain nightly
+cargo install --git https://github.com/alexcrichton/wasm-gc 
 
-    # Install necessary packages
-    npm install
+# Install necessary packages
+npm install
 
-    # Build the library
-    npm run build
+# Build the library
+npm run build
 
-    # Build and open the demo
-    npm run start:examples
+# Build and open the demo
+npm run start:examples
+```
+
+## License
+
+hyper3d-envmapgen, Copyright © 2017 yvt
+
+The source code of this library is licensed under [the MIT License].
+
+[the MIT License]: https://opensource.org/licenses/MIT
