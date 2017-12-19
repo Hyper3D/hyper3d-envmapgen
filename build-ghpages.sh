@@ -14,6 +14,7 @@ git add -f examples/*.html
 git add -f examples/*.js
 git add -f examples/*.css
 git add -f examples/*.jpg
+git add -f examples/*.map
 
 git commit -m "Update GitHub Pages"
 
