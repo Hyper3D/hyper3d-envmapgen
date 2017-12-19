@@ -90,7 +90,7 @@ export class LtasgBlur {
     /**
      * Synchronous constructor of `LtasgBlur`. `options.core`,
      * `options.core.module` and `options.core.instance` must not be `null` or
-     * `undefined`.
+     * `undefined` if this constructor is called from the main thread.
      */
     constructor(options: Readonly<LtasgOptions>) {
         this.core = new CoreInstance(options.core);

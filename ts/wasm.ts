@@ -17,7 +17,7 @@ export interface CoreOptions {
      * `hyperenvmap_wasm.wasm`.
      *
      * If omitted, a global module will be created automatically by calling
-     * `getGlobalCoreModule`.
+     * `getGlobalCoreModule` or `getGlobalCoreModulePromise`.
      */
     module?: WebAssembly.Module;
 
@@ -47,7 +47,8 @@ export interface CoreExports {
     ): void;
 }
 
-let globalModule: Promise<WebAssembly.Module> | null = null;
+let globalModule: WebAssembly.Module | null = null;
+let globalModulePromise: Promise<WebAssembly.Module> | null = null;
 
 /**
  * Retrieves the built-in core WebAssembly binary module. Can be used to
@@ -61,11 +62,21 @@ export function getCoreWasmBlob(): Uint8Array {
  * Retrieves the compiled global WebAssembly module. Triggers a synchronous
  * compilation on first use.
  */
-export function getGlobalCoreModule(): Promise<WebAssembly.Module> {
+export function getGlobalCoreModule(): WebAssembly.Module {
     if (!globalModule) {
-        globalModule = WebAssembly.compile(getCoreWasmBlob());
+        globalModule = new WebAssembly.Module(getCoreWasmBlob());
     }
     return globalModule;
+}
+
+/**
+ * Retrieves the compiled global WebAssembly module.
+ */
+export function getGlobalCoreModulePromise(): Promise<WebAssembly.Module> {
+    if (!globalModulePromise) {
+        globalModulePromise = WebAssembly.compile(getCoreWasmBlob());
+    }
+    return globalModulePromise;
 }
 
 /**
@@ -79,24 +90,19 @@ export class CoreInstance implements Readonly<CoreOptions> {
      * Asynchronous constructor of `CoreInstance`.
      */
     static async create(options: Readonly<CoreOptions> = {}): Promise<CoreInstance> {
-        const module = options.module || await getGlobalCoreModule();
+        const module = options.module || await getGlobalCoreModulePromise();
         const instance = options.instance || await WebAssembly.instantiate(module);
         return new CoreInstance({ ... options, module,  instance });
     }
 
     /**
      * Synchronous constructor of `CoreInstance`. `options.module` and
-     * `options.instance` must not be `null` or `undefined`.
+     * `options.instance` must not be `null` or `undefined` if this
+     * constructor is called from the main thread.
      */
     constructor(options: Readonly<CoreOptions> = {}) {
-        if (!options.module) {
-            throw new Error("options.module must be specified for synchronous construction.");
-        }
-        if (!options.instance) {
-            throw new Error("options.instance must be specified for synchronous construction.");
-        }
-        this.module = options.module;
-        this.instance = options.instance;
+        this.module = options.module || getGlobalCoreModule();
+        this.instance = options.instance || new WebAssembly.Instance(this.module);
 
         const emg: CoreExports = this.instance.exports;
         emg.emg_init();
